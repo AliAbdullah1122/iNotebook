@@ -2,16 +2,28 @@ import React, { useContext, useEffect, useRef } from "react";
 import NoteContext from "../context/notes/NoteContext";
 import NoteItem from "./NoteItem";
 import AddNote from "./AddNote";
+import { useNavigate } from "react-router-dom";
 
-const NotesList = () => {
+const NotesList = (props) => {
   const context = useContext(NoteContext);
-  const { notes, getAllNote ,editNote} = context;
+  const { notes, getAllNote, editNote } = context;
+  let navigate = useNavigate();
   useEffect(() => {
-    getAllNote();
+    if (localStorage.getItem("token")) {
+      getAllNote();
+    } else {
+      navigate("/login");
+    }
   }, []);
 
   const updateNote = (currentNote) => {
-    ref.current.click(); setNote( { id:currentNote._id, etitle :currentNote.title,edescription:currentNote.description,etag:currentNote.tag});
+    ref.current.click();
+    setNote({
+      id: currentNote._id,
+      etitle: currentNote.title,
+      edescription: currentNote.description,
+      etag: currentNote.tag,
+    });
   };
   const ref = useRef(null);
   const refClose = useRef(null);
@@ -19,23 +31,23 @@ const NotesList = () => {
     etitle: "",
     edescription: "",
     etag: "",
-    id:""
+    id: "",
   });
- 
+
   const onChange = (e) => {
     setNote({ ...note, [e.target.name]: e.target.value });
   };
 
-  const handleClick = (e) =>{
-    console.log('Updating the nnote',note)
-editNote(note.id,note.etitle,note.edescription,note.etag)
-    refClose.current.click()
-
-  }
+  const handleClick = (e) => {
+    console.log("Updating the nnote", note);
+    editNote(note.id, note.etitle, note.edescription, note.etag);
+    refClose.current.click();
+    props.showAlert("Updated Successfully", "success");
+  };
 
   return (
     <>
-      <AddNote />
+      <AddNote showAlert={props.showAlert} />
       <button
         ref={ref}
         type="button"
@@ -108,7 +120,6 @@ editNote(note.id,note.etitle,note.edescription,note.etag)
                       name="etag"
                       onChange={onChange}
                       value={note.etag}
-                      
                     />
                   </div>
                 </form>
@@ -123,7 +134,14 @@ editNote(note.id,note.etitle,note.edescription,note.etag)
               >
                 Close
               </button>
-              <button disabled={note.etitle.length < 5 || note.edescription.length < 5} onClick={handleClick} type="button" className="btn btn-primary">
+              <button
+                disabled={
+                  note.etitle.length < 5 || note.edescription.length < 5
+                }
+                onClick={handleClick}
+                type="button"
+                className="btn btn-primary"
+              >
                 Update Note
               </button>
             </div>
@@ -133,12 +151,16 @@ editNote(note.id,note.etitle,note.edescription,note.etag)
       <div className="row my-3">
         <h2>Your Note</h2>
         <div className="container mx-2">
-        
-        {notes.length === 0 && 'No Notes to Display'}
+          {notes.length === 0 && "No Notes to Display"}
         </div>
         {notes.map((note) => {
           return (
-            <NoteItem key={note._id} updateNote={updateNote} note={note} />
+            <NoteItem
+              key={note._id}
+              updateNote={updateNote}
+              showAlert={props.showAlert}
+              note={note}
+            />
           );
         })}
       </div>

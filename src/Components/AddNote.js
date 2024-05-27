@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import NotesList from "./NotesList";
 import NoteContext from "../context/notes/NoteContext";
 
-const AddNote = () => {
+const AddNote = (props) => {
   const context = useContext(NoteContext);
   const { addNote } = context;
 
@@ -15,13 +15,14 @@ const AddNote = () => {
     e.preventDefault();
     addNote(note.title, note.description, note.tag);
     setNote({ title: "", description: "", tag: "" });
+    props.showAlert("Added Successfully", "success");
   };
   const onChange = (e) => {
     setNote({ ...note, [e.target.name]: e.target.value });
   };
 
   return (
-    <div>
+    <div className="container mt-3">
       <h2>Add a Note</h2>
       <div className="container my-3">
         <form className="my-3">
